@@ -51,10 +51,10 @@ func RunArgs(args []string, stdout io.Writer) error {
 	if len(args) > 0 {
 		switch args[0] {
 		case "version", "--version", "-v":
-			_, _ = fmt.Fprintf(stdout, "gentle-ai %s\n", Version)
+			_, _ = fmt.Fprintf(stdout, "%s %s\n", RuntimeFlavor.Name, Version)
 			return nil
 		case "help", "--help", "-h":
-			printHelp(stdout, Version)
+			printHelp(stdout, RuntimeFlavor.Name, Version)
 			return nil
 		case "uninstall":
 			_, err := cli.RunUninstall(args[1:], stdout)
@@ -169,13 +169,13 @@ func RunArgs(args []string, stdout io.Writer) error {
 	case "restore":
 		return cli.RunRestore(args[1:], stdout)
 	default:
-		return fmt.Errorf("unknown command %q — run 'gentle-ai help' for available commands", args[0])
+		return fmt.Errorf("unknown command %q — run '%s help' for available commands", args[0], RuntimeFlavor.Name)
 	}
 }
 
 func runSkillRegistry(args []string, stdout io.Writer) error {
 	if len(args) == 0 || args[0] != "refresh" {
-		return fmt.Errorf("usage: gentle-ai skill-registry refresh [--cwd <dir>] [--force] [--quiet] [--no-gitignore]")
+		return fmt.Errorf("usage: %s skill-registry refresh [--cwd <dir>] [--force] [--quiet] [--no-gitignore]", RuntimeFlavor.Name)
 	}
 
 	cwd := ""

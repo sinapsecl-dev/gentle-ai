@@ -504,6 +504,18 @@ func Inject(homeDir string, adapter agents.Adapter, sddMode model.SDDModeID, opt
 				"sdd-design", "sdd-tasks", "sdd-apply", "sdd-verify", "sdd-archive",
 				"sdd-onboard", "judgment-day",
 			}
+			if adapter.Agent() == model.AgentOpenCode && len(opts.CRISPProfiles) > 0 {
+				sddSkills = append(sddSkills,
+					"crisp-business",
+					"crisp-data-understanding",
+					"crisp-data-preparation",
+					"crisp-modeling",
+					"crisp-evaluation",
+					"crisp-deployment",
+					"crisp-verify",
+					"crisp-archive",
+				)
+			}
 
 			for _, skill := range sddSkills {
 				embedDir := "skills/" + skill

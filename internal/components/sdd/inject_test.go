@@ -4214,6 +4214,11 @@ func TestInjectOpenCodeWithCRISPProfileWritesCRISPPromptsAndOverlay(t *testing.T
 		if _, err := os.Stat(path); err != nil {
 			t.Fatalf("expected CRISP prompt %q: %v", path, err)
 		}
+
+		skillPath := filepath.Join(home, ".config", "opencode", "skills", phase, "SKILL.md")
+		if _, err := os.Stat(skillPath); err != nil {
+			t.Fatalf("expected CRISP skill %q: %v", skillPath, err)
+		}
 	}
 
 	settingsPath := filepath.Join(home, ".config", "opencode", "opencode.json")

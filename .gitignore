@@ -22,6 +22,10 @@
 .DS_Store
 Thumbs.db
 
+# Python local caches
+__pycache__/
+*.py[cod]
+
 # Docker
 *.tar
 cmd/gentle-ai/main

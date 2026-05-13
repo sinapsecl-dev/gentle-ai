@@ -30,6 +30,9 @@ dist/
 # Agent tooling metadata (generated per-user, not product code)
 .atl/
 
+# Local git worktrees for isolated feature work
+.worktrees/
+
 # Engram local runtime state (project sync chunks are intentionally versioned)
 .engram/engram.db
 .engram/cloud.json

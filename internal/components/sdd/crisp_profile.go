@@ -21,6 +21,9 @@ func GenerateCRISPProfileOverlay(profile model.Profile, homeDir string) ([]byte,
 	for _, phase := range crispPhaseOrder {
 		taskPerms[phase+suffix] = "allow"
 	}
+	for _, sddPhase := range []string{"sdd-spec", "sdd-design", "sdd-tasks", "sdd-apply", "sdd-verify"} {
+		taskPerms[sddPhase] = "allow"
+	}
 
 	orchPrompt := buildCRISPOrchestratorPrompt(profile)
 	orchEntry := map[string]any{

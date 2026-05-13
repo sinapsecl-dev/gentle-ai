@@ -103,7 +103,49 @@ func TestGenerateCRISPProfileOverlayTaskPermissions(t *testing.T) {
 			t.Fatalf("permission for %s = %v, want allow", key, taskMap[key])
 		}
 	}
-	if taskMap["sdd-apply"] != nil {
-		t.Fatalf("CRISP orchestrator unexpectedly allowed sdd-apply")
+	for _, sddPhase := range []string{"sdd-spec", "sdd-design", "sdd-tasks", "sdd-apply", "sdd-verify"} {
+		if taskMap[sddPhase] != "allow" {
+			t.Fatalf("permission for %s = %v, want allow", sddPhase, taskMap[sddPhase])
+		}
+	}
+}
+
+func TestGenerateCRISPProfileOverlayPromptContainsSDDHandoffContract(t *testing.T) {
+	home := t.TempDir()
+	overlay, err := GenerateCRISPProfileOverlay(makeCRISPProfile(), home)
+	if err != nil {
+		t.Fatalf("GenerateCRISPProfileOverlay() error = %v", err)
+	}
+
+	var root map[string]any
+	if err := json.Unmarshal(overlay, &root); err != nil {
+		t.Fatalf("overlay is not valid JSON: %v", err)
+	}
+	orch := root["agent"].(map[string]any)["crisp-orchestrator-sdd-crisp"].(map[string]any)
+	prompt := orch["prompt"].(string)
+
+	markers := []string{
+		"must NOT implement product code inline",
+		"planning/governance/review",
+		"CRISP-to-SDD handoff",
+		"business-understanding",
+		"data-understanding",
+		"data-preparation",
+		"modeling",
+		"evaluation",
+		"deployment",
+		"binding constraints",
+		"sdd-spec",
+		"sdd-design",
+		"sdd-tasks",
+		"sdd-apply",
+		"sdd-verify",
+		"missing CRISP artifacts",
+		"ask for confirmation",
+	}
+	for _, marker := range markers {
+		if !strings.Contains(prompt, marker) {
+			t.Fatalf("orchestrator prompt missing marker %q", marker)
+		}
 	}
 }

@@ -4194,6 +4194,44 @@ func TestInjectOpenCodeWithTwoProfiles_BothOrchestratorsPresent(t *testing.T) {
 	}
 }
 
+func TestInjectOpenCodeWithCRISPProfileWritesCRISPPromptsAndOverlay(t *testing.T) {
+	home := t.TempDir()
+	mockNoPackageManager(t)
+
+	profile := model.Profile{Name: "sdd-crisp", PhaseAssignments: map[string]model.ModelAssignment{}}
+	result, err := Inject(home, opencodeAdapter(), model.SDDModeMulti, InjectOptions{
+		CRISPProfiles: []model.Profile{profile},
+	})
+	if err != nil {
+		t.Fatalf("Inject(opencode, CRISPProfiles) error = %v", err)
+	}
+	if !result.Changed {
+		t.Fatal("Inject(opencode, CRISPProfiles) changed = false")
+	}
+
+	for _, phase := range CRISPPhaseOrder() {
+		path := filepath.Join(CRISPSharedPromptDir(home), phase+".md")
+		if _, err := os.Stat(path); err != nil {
+			t.Fatalf("expected CRISP prompt %q: %v", path, err)
+		}
+	}
+
+	settingsPath := filepath.Join(home, ".config", "opencode", "opencode.json")
+	content, err := os.ReadFile(settingsPath)
+	if err != nil {
+		t.Fatalf("ReadFile(opencode.json) error = %v", err)
+	}
+	text := string(content)
+	for _, want := range []string{"crisp-orchestrator-sdd-crisp", "crisp-business-sdd-crisp", "crisp-verify-sdd-crisp"} {
+		if !strings.Contains(text, want) {
+			t.Fatalf("opencode.json missing %q", want)
+		}
+	}
+	if !strings.Contains(text, "gentle-orchestrator") {
+		t.Fatal("existing SDD orchestrator missing after CRISP injection")
+	}
+}
+
 // TestInjectClaudeSubAgentsResolveModels verifies that when SDD is injected
 // for the Claude adapter, the embedded sub-agent files are copied to
 // ~/.claude/agents/ and the {{CLAUDE_MODEL}} placeholder is substituted per

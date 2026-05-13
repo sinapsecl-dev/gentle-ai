@@ -40,6 +40,10 @@ type InjectOptions struct {
 	// is skipped — it is handled by the existing flow.
 	Profiles []model.Profile
 
+	// CRISPProfiles lists named CRISP profiles to generate and merge into the
+	// OpenCode settings file. This is opt-in and only applied for OpenCode.
+	CRISPProfiles []model.Profile
+
 	// PreserveOpenCodeOrchestratorPrompt keeps the existing
 	// opencode.json agent.gentle-orchestrator.prompt value during sync.
 	// Used by external-single-active profile strategy integrations where
@@ -424,6 +428,30 @@ func Inject(homeDir string, adapter agents.Adapter, sddMode model.SDDModeID, opt
 				}
 				changed = changed || profileResult.writeResult.Changed
 				mergedSettingsBytes = profileResult.merged
+			}
+
+			if adapter.Agent() == model.AgentOpenCode && len(opts.CRISPProfiles) > 0 {
+				changedPrompts, err := WriteCRISPSharedPromptFiles(homeDir)
+				if err != nil {
+					return InjectionResult{}, err
+				}
+				changed = changed || changedPrompts
+				files = append(files, CRISPSharedPromptDir(homeDir))
+
+				settingsPath := filepath.Join(adapter.GlobalConfigDir(homeDir), "opencode.json")
+				for _, profile := range opts.CRISPProfiles {
+					overlay, err := GenerateCRISPProfileOverlay(profile, homeDir)
+					if err != nil {
+						return InjectionResult{}, err
+					}
+					mergeResult, err := mergeJSONFile(settingsPath, overlay)
+					if err != nil {
+						return InjectionResult{}, err
+					}
+					changed = changed || mergeResult.writeResult.Changed
+					files = append(files, settingsPath)
+					mergedSettingsBytes = mergeResult.merged
+				}
 			}
 		}
 	}

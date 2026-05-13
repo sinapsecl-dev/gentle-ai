@@ -66,6 +66,13 @@ var (
 	// an install or sync records which version of gentle-ai made it.
 	// Default "dev" matches the ldflags default in app.Version.
 	AppVersion = "dev"
+
+	// RuntimeFlavorName controls flavor-specific install behavior from app entrypoints.
+	// Default keeps current gentle-ai behavior.
+	RuntimeFlavorName = "gentle-ai"
+
+	// sddInject is a test seam for componentApplyStep SDD injection.
+	sddInject = sdd.Inject
 )
 
 // SetCommandOutputStreaming toggles whether command stdout/stderr is streamed
@@ -605,14 +612,8 @@ func (s componentApplyStep) Run() error {
 	case model.ComponentSDD:
 		for _, adapter := range adapters {
 			targetDir := componentInjectionDir(s.homeDir, s.workspaceDir, adapter)
-			opts := sdd.InjectOptions{
-				OpenCodeModelAssignments: s.selection.ModelAssignments,
-				ClaudeModelAssignments:   s.selection.ClaudeModelAssignments,
-				KiroModelAssignments:     s.selection.KiroModelAssignments,
-				WorkspaceDir:             s.workspaceDir,
-				StrictTDD:                s.selection.StrictTDD,
-			}
-			if _, err := sdd.Inject(targetDir, adapter, s.selection.SDDMode, opts); err != nil {
+			opts := buildSDDInjectOptions(s.selection, s.workspaceDir, adapter.Agent())
+			if _, err := sddInject(targetDir, adapter, s.selection.SDDMode, opts); err != nil {
 				return fmt.Errorf("inject sdd for %q: %w", adapter.Agent(), err)
 			}
 		}
@@ -692,6 +693,22 @@ func (s componentApplyStep) Run() error {
 	default:
 		return fmt.Errorf("component %q is not supported in install runtime", s.component)
 	}
+}
+
+func buildSDDInjectOptions(selection model.Selection, workspaceDir string, agent model.AgentID) sdd.InjectOptions {
+	opts := sdd.InjectOptions{
+		OpenCodeModelAssignments: selection.ModelAssignments,
+		ClaudeModelAssignments:   selection.ClaudeModelAssignments,
+		KiroModelAssignments:     selection.KiroModelAssignments,
+		WorkspaceDir:             workspaceDir,
+		StrictTDD:                selection.StrictTDD,
+	}
+
+	if RuntimeFlavorName == "gentle-ai-crisp" && agent == model.AgentOpenCode {
+		opts.CRISPProfiles = []model.Profile{{Name: "sdd-crisp"}}
+	}
+
+	return opts
 }
 
 func ensureGoAvailableAfterInstall(profile system.PlatformProfile) error {

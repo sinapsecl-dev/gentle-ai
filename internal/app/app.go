@@ -45,6 +45,7 @@ func RunArgs(args []string, stdout io.Writer) error {
 	// Propagate the build-time version to the CLI and upgrade layers so backup
 	// manifests record which version of gentle-ai created them.
 	cli.AppVersion = Version
+	cli.RuntimeFlavorName = RuntimeFlavor.Name
 	upgrade.AppVersion = Version
 
 	// Info commands: no system detection, no self-update, no platform validation.

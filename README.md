@@ -1,10 +1,10 @@
 <div align="center">
 
-<img width="3276" height="1280" alt="Gentle-AI neon rose banner" src="docs/assets/brand/gentle-ai-banner.png" />
+<img width="1792" height="1024" alt="CRISP-DM AI neon banner" src="crisp-dm-ai-banner.png" />
 
-<h1>Gentle-AI</h1>
+<h1>CRISP-DM AI</h1>
 
-<p><strong>Gentle-AI — Ecosystem, Frameworks, Workflows for AI coding agents.</strong></p>
+<p><strong>CRISP-DM AI — a Gentle-AI fork that brings CRISP-DM discipline to AI-assisted Data Science and ML workflows.</strong></p>
 
 <p>
 <a href="https://github.com/Gentleman-Programming/gentle-ai/releases"><img src="https://img.shields.io/github/v/release/Gentleman-Programming/gentle-ai" alt="Release"></a>
@@ -17,15 +17,79 @@
 
 ---
 
-## What It Does
+## What This Fork Does
 
-Gentle-AI is NOT an AI agent installer. Most agents are easy to install. It is an **ecosystem configurator** -- it takes whatever AI coding agent(s) you use and supercharges them with persistent memory, Spec-Driven Development workflows, curated coding skills, MCP servers, an AI provider switcher, a teaching-oriented persona with security-first permissions, and per-phase model assignment so each SDD step can run on a different model.
+This repository is a fork of the original [Gentle-AI](https://github.com/Gentleman-Programming/gentle-ai) project. The original repository is an **ecosystem configurator** for AI coding agents: it adds persistent memory, Spec-Driven Development workflows, curated skills, MCP servers, model routing, and a teaching-oriented persona to the agents you already use.
 
-**Before**: "I installed Claude Code / OpenCode / Cursor, but it's just a chatbot that writes code."
+This fork keeps that foundation and adapts it for a Data Science / ML workflow where **CRISP-DM is the visible methodology** and **SDD is the internal execution chassis**.
 
-**After**: Your agent now has memory, skills, workflow, MCP tools, and a persona that actually teaches you.
+**Before**: "I have an AI coding agent, but my Data Science workflow still depends on loose prompts and scattered decisions."
 
-### 13 Supported Agents
+**After**: Your agent can reason through CRISP-DM phases while keeping the SDD guarantees: artifacts, delegation boundaries, verification, persistent memory, and review safety.
+
+### Mental Model
+
+| Layer | Role in this fork |
+| ----- | ----------------- |
+| **CRISP-DM** | The domain workflow for Data Science and ML work: business understanding, data understanding, preparation, modeling, evaluation, deployment, verification, and archive. |
+| **SDD** | The internal discipline layer: artifact contracts, phase boundaries, delegation, Strict TDD support, Engram memory, and review workload control. |
+| **Gentle-AI** | The original installer/configurator that wires supported agents, skills, MCP servers, backups, profiles, and persona behavior. |
+| **`gentle-ai-crisp`** | The demo fork binary/flavor prepared for the CRISP-DM AI experiment, with its own runtime name and config namespace. |
+
+The important architectural decision is simple: **CRISP-DM does not replace SDD**. It sits on top of it. SDD remains the structure that keeps the AI workflow auditable instead of turning it into improvised prompting.
+
+---
+
+## Demo Status
+
+The demo branch prepares the fork around three concrete pieces:
+
+1. **A CRISP-DM AI identity** — the README and project banner now present the fork as CRISP-DM AI.
+2. **A separate demo flavor** — `cmd/gentle-ai-crisp/main.go` starts the same core application as `gentle-ai`, but identifies itself as `gentle-ai-crisp` and uses the `gentle-ai-crisp` config namespace.
+3. **A documented CRISP-DM + SDD plan** — the design and implementation plan live under `docs/superpowers/` and describe how native `crisp-*` phases should reuse the existing SDD architecture.
+
+Relevant planning documents:
+
+| Document | Purpose |
+| -------- | ------- |
+| [`docs/superpowers/specs/2026-05-13-sdd-crisp-profile-design.md`](docs/superpowers/specs/2026-05-13-sdd-crisp-profile-design.md) | Technical design for the SDD-CRISP native profile. |
+| [`docs/superpowers/plans/2026-05-13-sdd-crisp-profile.md`](docs/superpowers/plans/2026-05-13-sdd-crisp-profile.md) | Implementation plan for CRISP phase agents, OpenCode profile overlays, tests, and demo fixture. |
+
+---
+
+## CRISP-DM Workflow Supported by the Fork
+
+The CRISP-DM AI workflow is designed around these phases:
+
+| Phase | Expected output |
+| ----- | --------------- |
+| **Business Understanding** | Objective, hypothesis, stakeholder, success metric, risk level. |
+| **Data Understanding** | Data sources, schema, quality, permissions, PII, freshness risks. |
+| **Data Preparation** | Transformations, split strategy, lineage, reproducibility, leakage checks. |
+| **Modeling** | Baseline, candidate model, metrics, seeds, experiment evidence. |
+| **Evaluation** | Baseline comparison, error analysis, threshold rationale, decision. |
+| **Deployment** | Readiness, rollback, monitoring, drift plan, approval needs. |
+| **Verify** | Audit of code, data, metrics, reproducibility, governance, and readiness. |
+| **Archive** | Final decision, learnings, artifact links, and model/data cards when applicable. |
+
+The intended agent flow is:
+
+```txt
+gentle-orchestrator
+  -> detects Data Science / ML intent
+  -> activates the CRISP-DM profile path
+  -> delegates to crisp-* phase agents
+  -> persists artifacts through Engram or OpenSpec
+  -> verifies reproducibility, metrics, governance, and deployment readiness
+```
+
+The guiding rule is: **detect, respect, then recommend**. The agent should inspect the existing project conventions before proposing new tools or replacing the user's stack.
+
+---
+
+## Supported Agents
+
+The fork inherits the original Gentle-AI agent support matrix.
 
 | Agent               |         Delegation Model         | Key Feature                                                     |
 | ------------------- | :------------------------------: | --------------------------------------------------------------- |
@@ -44,56 +108,45 @@ Gentle-AI is NOT an AI agent installer. Most agents are easy to install. It is a
 | **OpenClaw**        |            Solo-agent            | Workspace-first `AGENTS.md` / `SOUL.md` with global MCP config  |
 | **Pi**              | Full (package-managed subagents) | `gentle-pi` harness with persona/model commands + Engram memory |
 
-> **Note**: This project supersedes [Agent Teams Lite](https://github.com/Gentleman-Programming/agent-teams-lite) (now archived). Everything ATL provided is included here with better installation, automatic updates, and persistent memory.
-
-### Delegation Triggers
-
-Gentle-AI keeps the parent/orchestrator thread thin. Once a task stops being small, delegation or an explicit SDD phase boundary is expected rather than optional.
-
-| Trigger                                                                    | Expected behavior                                         |
-| -------------------------------------------------------------------------- | --------------------------------------------------------- |
-| Reading 4+ files to understand a flow                                      | Delegate exploration or run an exploration phase.         |
-| Touching 2+ non-trivial files                                              | Use one writer or require fresh review before completion. |
-| Commit, push, or PR after code changes                                     | Run fresh review unless the diff is trivial docs/text.    |
-| Wrong cwd, worktree/git accident, merge recovery, confusing test/env issue | Stop and run a fresh audit before continuing.             |
-| Long monolithic session with accumulating complexity                       | Pause and delegate, re-plan, or justify why not.          |
-| Adversarial review of diffs, conflicts, PR readiness, or incidents         | Use fresh context when the agent platform supports it.    |
-
-The goal is not ceremony. The goal is to avoid accidental chaos while preserving one responsible orchestrator and one writer thread.
+> **Note**: The original Gentle-AI project supersedes [Agent Teams Lite](https://github.com/Gentleman-Programming/agent-teams-lite). This fork builds on that ecosystem instead of replacing it.
 
 ---
 
 ## Quick Start
 
-### macOS / Linux
+### Recommended path for the CRISP-DM AI demo
+
+Build the fork locally and run the isolated demo binary:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Gentleman-Programming/gentle-ai/main/scripts/install.sh | bash
+go build -o gentle-ai-crisp ./cmd/gentle-ai-crisp
+./gentle-ai-crisp help
 ```
 
-### Windows
+On Windows PowerShell:
 
 ```powershell
-scoop bucket add gentleman https://github.com/Gentleman-Programming/scoop-bucket
-scoop install gentle-ai
+go build -o gentle-ai-crisp.exe ./cmd/gentle-ai-crisp
+.\gentle-ai-crisp.exe help
 ```
 
-### After install: project-level setup
+Then install or sync the agent configuration through the fork binary:
 
-Once your agents are configured, open your AI agent in a project and run these two commands to register the project context:
+```bash
+./gentle-ai-crisp install
+./gentle-ai-crisp sync
+```
 
-| Command          | What it does                                                                | When to re-run                                                                 |
-| ---------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `/sdd-init`      | Detects stack, testing capabilities, activates Strict TDD Mode if available | When your project adds/removes test frameworks, or first time in a new project |
-| `skill-registry` | Scans installed skills and project conventions, builds the registry         | After installing/removing skills, or first time in a new project               |
+On Windows PowerShell:
 
-These are **not required** for basic usage. The SDD orchestrator runs `/sdd-init` automatically if it detects no context. But if something changed in your project (new test runner, new dependencies), re-running them manually ensures the agents have up-to-date context.
+```powershell
+.\gentle-ai-crisp.exe install
+.\gentle-ai-crisp.exe sync
+```
 
----
+### Original Gentle-AI install path
 
-## Install
-
-### Recommended
+Use this if you want the upstream Gentle-AI CLI instead of the local CRISP-DM AI demo binary.
 
 ```bash
 # macOS / Linux
@@ -116,7 +169,7 @@ go install github.com/gentleman-programming/gentle-ai/cmd/gentle-ai@latest
 
 #### Windows
 
-Use Scoop on Windows. It is the supported install path for keeping Gentle AI updated cleanly:
+Use Scoop on Windows. It is the supported install path for keeping Gentle-AI updated cleanly:
 
 ```powershell
 scoop bucket add gentleman https://github.com/Gentleman-Programming/scoop-bucket
@@ -127,11 +180,45 @@ scoop install gentle-ai
 
 ---
 
-## Backups
+## Configure a Project for the Demo
 
-Every install, sync, and upgrade automatically snapshots your config files. Backups are **compressed** (tar.gz), **deduplicated** (identical configs are not re-backed up), and **auto-pruned** (keeps the 5 most recent). Pin important backups via the TUI (`p` key) to protect them from pruning.
+Once the installer/sync has configured your agent, open the agent inside the target project and prepare the local context.
 
-See [Backup & Rollback Guide](docs/rollback.md) for details.
+| Command | What it does | When to re-run |
+| ------- | ------------ | -------------- |
+| `/sdd-init` | Detects stack, testing capabilities, and Strict TDD support. | First time in a project, or when the test/dependency setup changes. |
+| `skill-registry refresh` | Builds `.atl/skill-registry.md` so the orchestrator can inject compact project standards into subagents. | First time in a project, or after adding/removing skills or conventions. |
+
+The SDD orchestrator can run `/sdd-init` automatically when no project context exists, but for the demo it is better to run it explicitly so the setup is visible and repeatable.
+
+### Suggested demo prompt
+
+Use a prompt that makes the Data Science intent explicit:
+
+```txt
+Use the CRISP-DM AI workflow to plan a small forecasting experiment.
+Start with business understanding, identify the data assumptions,
+define the baseline, and explain what evidence we need before deployment.
+```
+
+For the current demo branch, the CRISP-DM profile is documented as an SDD extension path. The core SDD workflow remains available through the existing `/sdd-*` commands and agent orchestration.
+
+---
+
+## Delegation Triggers
+
+Gentle-AI keeps the parent/orchestrator thread thin. Once a task stops being small, delegation or an explicit SDD/CRISP phase boundary is expected rather than optional.
+
+| Trigger                                                                    | Expected behavior                                         |
+| -------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Reading 4+ files to understand a flow                                      | Delegate exploration or run an exploration phase.         |
+| Touching 2+ non-trivial files                                              | Use one writer or require fresh review before completion. |
+| Commit, push, or PR after code changes                                     | Run fresh review unless the diff is trivial docs/text.    |
+| Wrong cwd, worktree/git accident, merge recovery, confusing test/env issue | Stop and run a fresh audit before continuing.             |
+| Long monolithic session with accumulating complexity                       | Pause and delegate, re-plan, or justify why not.          |
+| Adversarial review of diffs, conflicts, PR readiness, or incidents         | Use fresh context when the agent platform supports it.    |
+
+The goal is not ceremony. The goal is to avoid accidental chaos while preserving one responsible orchestrator and one writer thread.
 
 ---
 
@@ -172,12 +259,20 @@ engram tui                    # Visual memory browser
 
 **Full reference**: [Engram Commands](docs/engram.md)
 
+### Backups
+
+Every install, sync, and upgrade automatically snapshots your config files. Backups are **compressed** (tar.gz), **deduplicated** (identical configs are not re-backed up), and **auto-pruned** (keeps the 5 most recent). Pin important backups via the TUI (`p` key) to protect them from pruning.
+
+See [Backup & Rollback Guide](docs/rollback.md) for details.
+
 ---
 
 ## Documentation
 
 | Topic                                              | Description                                                                             |
 | -------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [CRISP-DM AI Design](docs/superpowers/specs/2026-05-13-sdd-crisp-profile-design.md) | Design for adapting SDD to the CRISP-DM workflow. |
+| [CRISP-DM AI Implementation Plan](docs/superpowers/plans/2026-05-13-sdd-crisp-profile.md) | Planned work for native CRISP phases, prompts, profile overlays, tests, and demo fixture. |
 | [Intended Usage](docs/intended-usage.md)           | How Gentle-AI is meant to be used — the mental model                                    |
 | [OpenCode SDD Profiles](docs/opencode-profiles.md) | Create and manage per-phase model profiles for OpenCode                                 |
 | [Engram Commands](docs/engram.md)                  | CLI commands, MCP tools, project management, team sharing                               |
@@ -204,23 +299,33 @@ This project gets better when the community builds on top of it.
 
 When you select OpenCode in the installer, Gentle-AI asks whether to register each community plugin and offers a browser shortcut to review the repository first. Gentle-AI only ensures `~/.config/opencode/tui.json` exists and adds the plugin package names to its `plugin` array; OpenCode installs/loads those packages the next time it starts. Once OpenCode has materialized a plugin under `~/.config/opencode/node_modules/`, `gentle-ai update` can compare its local `package.json` version with the plugin's GitHub releases.
 
-## Contributors
-
-This project exists because of the community. See [CONTRIBUTORS.md](CONTRIBUTORS.md) for the full list.
-
-<a href="https://github.com/Gentleman-Programming/gentle-ai/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Gentleman-Programming/gentle-ai" />
-</a>
-
 ---
 
 ## Next Steps
 
-- **Just installed?** Read [Intended Usage](docs/intended-usage.md) -- the one page that explains the mental model.
+- **Preparing the CRISP-DM AI demo?** Build `gentle-ai-crisp`, run `install`/`sync`, then initialize the target project with `/sdd-init` and `skill-registry refresh`.
+- **Extending the CRISP-DM profile?** Start with the design and implementation plan under `docs/superpowers/`.
 - **Using OpenCode?** Set up [SDD Profiles](docs/opencode-profiles.md) to assign different models per phase.
-- **Using Pi?** Read [Pi Agent](docs/pi.md) for Pi commands, persona, model assignments, and package behavior.
 - **Want to share memory across machines?** Learn `engram sync` in the [Engram reference](docs/engram.md).
-- **Ready to contribute?** Check [CONTRIBUTING.md](CONTRIBUTING.md) and the [open issues](https://github.com/Gentleman-Programming/gentle-ai/issues?q=is%3Aissue+is%3Aopen+label%3A%22status%3Aapproved%22).
+- **Ready to contribute upstream?** Check [CONTRIBUTING.md](CONTRIBUTING.md) and the [open issues](https://github.com/Gentleman-Programming/gentle-ai/issues?q=is%3Aissue+is%3Aopen+label%3A%22status%3Aapproved%22).
+
+---
+
+## Contributors
+
+This fork exists because the original Gentle-AI ecosystem created the foundation for agentic SDD workflows.
+
+### CRISP-DM AI fork
+
+- [@klagos](https://github.com/klagos) — initial fork contributor, responsible for the CRISP-DM AI direction and the implementation path for CRISP-DM workflow logic.
+
+### Original Gentle-AI project
+
+See [CONTRIBUTORS.md](CONTRIBUTORS.md) for the full upstream contributor list.
+
+<a href="https://github.com/Gentleman-Programming/gentle-ai/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Gentleman-Programming/gentle-ai" alt="Gentle-AI contributors" />
+</a>
 
 ---
 

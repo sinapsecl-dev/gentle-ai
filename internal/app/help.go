@@ -5,12 +5,12 @@ import (
 	"io"
 )
 
-func printHelp(w io.Writer, version string) {
-	fmt.Fprintf(w, `gentle-ai — Gentle-AI: Ecosystem, Frameworks, Workflows (%s)
+func printHelp(w io.Writer, binaryName, version string) {
+	fmt.Fprintf(w, `%s — Gentle-AI: Ecosystem, Frameworks, Workflows (%s)
 
 USAGE
-  gentle-ai                     Launch interactive TUI
-  gentle-ai <command> [flags]
+  %s                     Launch interactive TUI
+  %s <command> [flags]
 
 COMMANDS
   install      Configure AI coding agents on this machine
@@ -26,7 +26,7 @@ COMMANDS
 FLAGS
   --help, -h    Show this help
 
-Run 'gentle-ai help' for this message.
+Run '%s help' for this message.
 Documentation: https://github.com/Gentleman-Programming/gentle-ai
-`, version)
+`, binaryName, version, binaryName, binaryName, binaryName)
 }

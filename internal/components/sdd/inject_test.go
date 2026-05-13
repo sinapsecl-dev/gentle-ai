@@ -4217,6 +4217,16 @@ func TestInjectOpenCodeWithCRISPProfileWritesCRISPPromptsAndOverlay(t *testing.T
 	}
 
 	settingsPath := filepath.Join(home, ".config", "opencode", "opencode.json")
+	settingsPathCount := 0
+	for _, changedPath := range result.Files {
+		if changedPath == settingsPath {
+			settingsPathCount++
+		}
+	}
+	if settingsPathCount != 1 {
+		t.Fatalf("expected opencode.json to be reported once in result.Files, got %d", settingsPathCount)
+	}
+
 	content, err := os.ReadFile(settingsPath)
 	if err != nil {
 		t.Fatalf("ReadFile(opencode.json) error = %v", err)

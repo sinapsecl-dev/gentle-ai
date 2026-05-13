@@ -439,6 +439,13 @@ func Inject(homeDir string, adapter agents.Adapter, sddMode model.SDDModeID, opt
 				files = append(files, CRISPSharedPromptDir(homeDir))
 
 				settingsPath := filepath.Join(adapter.GlobalConfigDir(homeDir), "opencode.json")
+				hasSettingsPath := false
+				for _, path := range files {
+					if path == settingsPath {
+						hasSettingsPath = true
+						break
+					}
+				}
 				for _, profile := range opts.CRISPProfiles {
 					overlay, err := GenerateCRISPProfileOverlay(profile, homeDir)
 					if err != nil {
@@ -449,7 +456,10 @@ func Inject(homeDir string, adapter agents.Adapter, sddMode model.SDDModeID, opt
 						return InjectionResult{}, err
 					}
 					changed = changed || mergeResult.writeResult.Changed
-					files = append(files, settingsPath)
+					if !hasSettingsPath {
+						files = append(files, settingsPath)
+						hasSettingsPath = true
+					}
 					mergedSettingsBytes = mergeResult.merged
 				}
 			}

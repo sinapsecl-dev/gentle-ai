@@ -1929,6 +1929,9 @@ func (store RuntimeStore) rescope(ctx context.Context, request RescopeObjectiveR
 		if objective == nil {
 			return runtimeRecord{}, ErrRuntimeNoObjective
 		}
+		if supersede && request.WorkUnit == objective.WorkUnit && request.EvidenceGoal == objective.EvidenceGoal {
+			return runtimeRecord{}, ErrRuntimeSupersedeNotAllowed
+		}
 		// A complete objective is refused by the sentinel that names its
 		// successor (#3884), not by the generic structural refusal.
 		if status.Complete {
@@ -2627,6 +2630,9 @@ func applyRuntimeRescopeEvent(replay *runtimeReplay, revision string, record run
 	objective := replay.Status.Objective
 	if replay.Status.ActiveAttempt != nil || objective == nil || !runtimeObjectiveRescopeStructurallyPermitted(replay.Status) {
 		return rejectRuntimeRecord("objective_rescope_valid_successor")
+	}
+	if supersede && event.WorkUnit == objective.WorkUnit && event.EvidenceGoal == objective.EvidenceGoal {
+		return rejectRuntimeRecord("objective_supersede_same_scope")
 	}
 	// The real narrowing guard runs FIRST and is recomputed against the
 	// REPLAYED objective, never against the record's own (possibly forged)
